@@ -1,5 +1,4 @@
 # 📘 Tugas 1: API Sederhana dengan JWT (Flask)
-# Versi Lengkap (Wajib + Bonus)
 
 Implementasi API sederhana menggunakan Python, Flask, dan Flask-JWT-Extended.
 
