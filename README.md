@@ -78,5 +78,113 @@ Semua pengguna berikut menggunakan password yang sama: **`pass123`**
 | Hanif     | `hanif@gmail.com`      | `user`  |
 | Syariel   | `syariel@gmail.com`    | `user`  |
 
+## 4. Daftar Endpoint API
+
+### 4.1 Autentikasi
+
+#### `POST /auth/login`
+(Publik) Login untuk mendapatkan `access_token` (15 menit) dan `refresh_token` (7 hari).
+
+* **Body (JSON):**
+    ```json
+    {
+      "email": "ilham@gmail.com",
+      "password": "pass123"
+    }
+    ```
+* **Respon Sukses (200):**
+    ```json
+    {
+      "access_token": "<jwt_access_string_15m>",
+      "refresh_token": "<jwt_refresh_string_7d>"
+    }
+    ```
+
+#### `POST /auth/refresh` (Bonus)
+(Terproteksi) Menggunakan `refresh_token` untuk mendapatkan `access_token` baru.
+
+* **Header Wajib:** `Authorization: Bearer <REFRESH_TOKEN>`
+* **Respon Sukses (200):**
+    ```json
+    {
+      "access_token": "<jwt_access_string_baru_15m>"
+    }
+    ```
+
+### 4.2 Marketplace
+
+#### `GET /items` (Wajib)
+(Publik) Mendapatkan daftar item.
+
+* **Respon Sukses (200):**
+    ```json
+    {
+      "items": [
+        { "id": 1, "name": "Action Figure (Limited)", "price": 1250000 },
+        { "id": 2, "name": "Vinyl Record (Classic Album)", "price": 450000 },
+        { "id": 3, "name": "Model Kit (Gundam MG)", "price": 800000 },
+        { "id": 4, "name": "Rare Trading Card (Single)", "price": 300000 },
+        { "id": 5, "name": "Board Game (Catan)", "price": 650000 },
+        { "id": 6, "name": "Kamera Analog (Bekas)", "price": 1500000 },
+        { "id": 7, "name": "Buku Komik (Edisi Pertama)", "price": 500000 },
+        { "id": 8, "name": "Fountain Pen (Premium)", "price": 2100000 },
+        { "id": 9, "name": "Sepatu Lari (Marathon)", "price": 1750000 },
+        { "id": 10, "name": "Skateboard Deck (Art)", "price": 900000 }
+      ]
+    }
+    ```
+
+### 4.3 Profil Pengguna
+
+#### `PUT /profile` (Wajib)
+(Terproteksi) Memperbarui profil milik *user* yang sedang login.
+
+* **Header Wajib:** `Authorization: Bearer <ACCESS_TOKEN>`
+* **Body (JSON):** `{ "name": "Nama Baru" }`
+* **Respon Sukses (200):** `{"message": "Profile updated", "profile": ...}`
+* **Respon Gagal (401):** `{"error": "Access token expired"}`
+
+### 4.4 Admin
+
+#### `GET /admin/users` (Bonus)
+(Terproteksi - Admin Only) Melihat semua *user* di sistem.
+
+* **Header Wajib:** `Authorization: Bearer <ACCESS_TOKEN_ADMIN>`
+* **Respon Sukses (200):** `{"users": [...]}`
+* **Respon Gagal (403 Forbidden):** `{"error": "Admin access required"}`
+
+## 5. Contoh Pengujian (cURL)
+
+Buka **Terminal 2** (biarkan server berjalan di Terminal 1). Gunakan perintah cURL dalam **satu baris** untuk menghindari *error*.
+
+### Skenario 1: Login & Dapatkan Token
+Login sebagai *user* dan *admin* untuk mendapatkan token mereka.
+
+* **Login sebagai Ilham (User)**
+    ```bash
+    # 1. Login sebagai Ilham (User)
+    curl -s -X POST http://localhost:5000/auth/login -H "Content-Type: application/json" -d '{"email":"ilham@gmail.com","password":"pass123"}'
+    ```
+    * **Aksi:** Salin `access_token` dari output. Kita sebut `USER_TOKEN`.
+    * **Aksi:** Salin `refresh_token` dari output. Kita sebut `USER_REFRESH`.
+
+* **Login sebagai Admin**
+    ```bash
+    # 2. Login sebagai Admin
+    curl -s -X POST http://localhost:5000/auth/login -H "Content-Type: application/json" -d '{"email":"admin@gmail.com","password":"pass123"}'
+    ```
+    * **Aksi:** Salin `access_token` dari output. Kita sebut `ADMIN_TOKEN`.
+
+### Skenario 2: Set Variabel di Terminal (PENTING)
+Tetapkan token ke variabel terminal agar mudah digunakan. (Ganti `...` dengan token yang Anda salin).
+
+```bash
+# Set token Ilham (User)
+TOKEN="eyJhbGciOi...sZXIifQ.ZxMpiZ..."
+REFRESH_TOKEN="eyJhbGciOi...x1ZBI_tpd9U"
+
+# Set token Admin
+ADMIN_TOKEN="eyJhbGciOi...NVUm4"
+
 
 
